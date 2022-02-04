@@ -20,12 +20,14 @@ shellcmd xsh_hello(int nargs, char *args[])
 	}
 
 	if (nargs < 2) {
-		fprintf(stderr, "too few arguments\n");	
-        fprintf(stderr, "Try '%s --help' for more information\n",args[0]);
+		// fprintf(stderr, "too few arguments\n");	
+        // fprintf(stderr, "Try '%s --help' for more information\n",args[0]);
+		fprintf(stderr, "Syntax: run hello name\n");
 	}
     else if (nargs > 2) {
-		fprintf(stderr, "%s:too many arguments\n",args[0]);	
-        fprintf(stderr, "Try '%s --help' for more information\n",args[0]);
+		// fprintf(stderr, "%s:too many arguments\n",args[0]);	
+        // fprintf(stderr, "Try '%s --help' for more information\n",args[0]);
+		fprintf(stderr, "Syntax: run hello name\n");
 	}
     else{
         printf("Hello %s, Welcome to the world of Xinu!!\n",args[1]);

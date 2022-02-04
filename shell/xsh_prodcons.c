@@ -1,14 +1,17 @@
 #include <xinu.h>
 #include <prodcons.h>
 #include <stdio.h>
-int n;                 // Definition for global variable 'n'
+int n; // Definition for global variable 'n'
+            
 /* Now global variable n is accessible by all the processes i.e. consume and produce */
 
 shellcmd xsh_prodcons(int nargs, char *args[]) {
      
   // Argument verifications and validations
-  int count=2000;    // local varible to hold count
-
+  int count=200;    // local varible to hold count
+  sid32 prod,cons;
+  cons=semcreate(0);
+  prod=semcreate(1);
   // TODO: check args[1], if present assign value to count
     // if(nargs<2){
     //     count=2000;
@@ -28,7 +31,9 @@ shellcmd xsh_prodcons(int nargs, char *args[]) {
 
   // create the process producer and consumer and put them in ready queue.
   // Look at the definations of function create and resume in the system folder for reference.
-  resume(create(producer, 1024, 20, "producer", 1, count));
-  resume(create(consumer, 1024, 20, "consumer", 1, count));
-  return (0);
+  resume(create(producer, 1024, 20, "producer", 3, count,prod,cons));
+  resume(create(consumer, 1024, 20, "consumer", 3, count,prod,cons));
+  
+  
+  
 }
