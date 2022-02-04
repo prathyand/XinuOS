@@ -9,8 +9,8 @@ shellcmd xsh_prodcons(int nargs, char *args[]) {
      
   // Argument verifications and validations
   int count=200;    // local varible to hold count
-  cons=semcreate(0);
-  prod=semcreate(1);
+  cons=semcreate(1);
+  prod=semcreate(0);
   // TODO: check args[1], if present assign value to count
     // if(nargs<2){
     //     count=2000;
@@ -19,12 +19,13 @@ shellcmd xsh_prodcons(int nargs, char *args[]) {
         // count=(int)args[1];
         
         // sscanf(*args[1],"%d",count);
-        count=*args[1]-48;
+        count=atoi(args[1]);
         // printf("it is %d\n",count);
         
     }
     else if(nargs>2){
         fprintf(stderr, "too many arguments\n");	
+        return (0);
     }
     
 
@@ -33,6 +34,6 @@ shellcmd xsh_prodcons(int nargs, char *args[]) {
   resume(create(producer, 1024, 20, "producer", 1, count));
   resume(create(consumer, 1024, 20, "consumer", 1, count));
   
-  
+  return 1;
   
 }
