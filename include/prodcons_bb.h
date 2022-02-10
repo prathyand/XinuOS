@@ -1,4 +1,4 @@
-extern int arr_q[5];
+extern int arr_q[6];
 extern int* head;
 extern int* tail;
 sid32 forprodbb,forconsbb;

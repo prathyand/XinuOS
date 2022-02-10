@@ -12,13 +12,13 @@ shellcmd xsh_prodcons_bb(int nargs, char *args[]) {
     forprodbb=semcreate(0);
     forconsbb=semcreate(0);
     if(nargs!=5){
-        fprintf(stderr, "Syntax: run prodcons_bb <# of producer processes> <# of consumer processes> <# of iterations the producer runs> <# of iterations the consumer runs>\n");
+        printf("Syntax: run prodcons_bb <# of producer processes> <# of consumer processes> <# of iterations the producer runs> <# of iterations the consumer runs>\n");
         signal(spawnrun);
         return (0);
     }
-    printf("%d ,%d,%d,%d\n",atoi(args[1]),atoi(args[3]),atoi(args[2]),atoi(args[4]));
+    // printf("%d ,%d,%d,%d\n",atoi(args[1]),atoi(args[3]),atoi(args[2]),atoi(args[4]));
     if(atoi(args[1])*atoi(args[3])!=atoi(args[2])*atoi(args[4])){
-        fprintf(stderr, "Iteration Mismatch Error: the number of producer(s) iteration does not match the consumer(s) iteration\n");
+        printf("Iteration Mismatch Error: the number of producer(s) iteration does not match the consumer(s) iteration\n");
         signal(spawnrun);
         return (0);
     }
