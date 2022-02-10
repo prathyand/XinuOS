@@ -6,7 +6,7 @@
 #include <shprototypes.h>
 
 shellcmd xsh_prodcons_bb(int nargs, char *args[]) {
-    int arr_q[5];
+    int arr_q[6];
     int *head=arr_q;
     int *tail=arr_q;
     forprodbb=semcreate(0);

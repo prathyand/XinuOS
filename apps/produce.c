@@ -2,7 +2,7 @@
 #include <prodcons.h>
 #include <prodcons_bb.h>
 int n;
-int32 arr_q[5];
+int arr_q[6];
 int32 *head;
 void producer(int count) {
   // TODO: implement the following:
