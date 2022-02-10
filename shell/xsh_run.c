@@ -50,5 +50,6 @@ if(strncmp(args[0], "prodcons", 8) == 0) {
 for(i=0;i<funclength;i++){
         printf("%s\n",funcs[i]);
     }
+    
 
 }

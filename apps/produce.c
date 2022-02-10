@@ -2,8 +2,9 @@
 #include <prodcons.h>
 #include <prodcons_bb.h>
 int n;
-int arr_q[6];
-int32 *head;
+int maxcons;
+int arr_q[5];
+int head;
 void producer(int count) {
   // TODO: implement the following:
   // - Iterates from 0 to count (count including)
@@ -26,9 +27,18 @@ void producer_bb(int id, int count) {
   //     "name : producer_X, write : X"
   int i;
   for(i=0;i<count;i++){
-    *head=i;
-    printf("name : producer_%d, write : %d\n",id,*head);
+    // printf("waiting prod\n");
+    wait(mutex);
+    arr_q[head]=i;
+    printf("name : producer_%d, write : %d\n",id,arr_q[head]);
     head++;
+    if(head==5){
+      head=0;
+    }
+    signal(mutex);
+    signal(mutex2);
+    // printf("done prod\n");
   }
-  signal(forprodbb);
+  
+  return OK;
 }

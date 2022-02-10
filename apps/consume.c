@@ -2,8 +2,9 @@
 #include <prodcons.h>
 #include <prodcons_bb.h>
 int n;
-int arr_q[6];
-int32 *tail;
+int maxcons;
+int arr_q[5];
+int tail;
 void consumer(int count) {
   // TODO: implement the following:
   // - Iterates from 0 to count (count including)
@@ -29,8 +30,26 @@ void consumer_bb(int id, int count) {
   //     "name : consumer_X, read : X"
   int32 i;
   for(i=0;i<count;i++){
-    printf("name : consumer_%d, read : %d\n",id,*tail);
+    // printf("waiting cons\n");
+    wait(mutex2);
+    wait(mutex);
+    printf("name : consumer_%d, read : %d\n",id,arr_q[tail]);
+    // printf("maxcons %d\n",maxcons);
     tail++;
+    maxcons--;
+    if(tail==5){
+      tail=0;
+    }
+    signal(mutex);
+    // printf("done cons\n");
   }
-  signal(forconsbb);
+  if(maxcons==0){
+    // printf("reached here\n");
+    signal(finallydone);
+  }
+  // printf("tail and last arr %d,%d\n",tail,&arr_q[maxcons]);
+  // if(tail==&arr_q[maxcons]){
+  //   signal(finallydone);
+  // }
+ return OK;
 }
