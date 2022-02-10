@@ -3,7 +3,7 @@
 #include <shprototypes.h>
 #include <prodcons.h>
 shellcmd xsh_run(int nargs, char *args[]) {
-char *funcs[50]={"hello","list","prodcons"};
+char *funcs[50]={"hello","list","prodcons","prodcons_bb"};
 int funclength,i;
 i=0;
 

@@ -38,5 +38,4 @@ shellcmd xsh_prodcons(int nargs, char *args[]) {
   wait(prosfish);
   signal(spawnrun);
   return 1;
-  
 }
