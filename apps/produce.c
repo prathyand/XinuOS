@@ -24,10 +24,10 @@ void producer_bb(int id, int count) {
   //   - add iteration value to the global array `arr_q`
   //   - print producer id (starting from 0) and written value as:
   //     "name : producer_X, write : X"
-  int32 i;
+  int i;
   for(i=0;i<count;i++){
-    printf("name : producer_%d, write : %d\n",id,*tail);
     *head=i;
+    printf("name : producer_%d, write : %d\n",id,*head);
     head++;
   }
   signal(forprodbb);

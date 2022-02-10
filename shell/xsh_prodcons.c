@@ -27,6 +27,7 @@ shellcmd xsh_prodcons(int nargs, char *args[]) {
     }
     else if(nargs>2){
         fprintf(stderr, "Syntax: run prodcons [counter]\n");	
+        signal(spawnrun);
         return (0);
     }
     
