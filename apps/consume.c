@@ -11,6 +11,9 @@ void consumer(int count) {
     wait(prod);
     printf("consumed : %d\n",n);
     signal(cons);
+    if(i==count){
+      signal(prosfish);
+    }
   }
 
 }

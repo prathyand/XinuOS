@@ -3,6 +3,8 @@
 #include <xinu.h>
 #include <stdio.h>
 #include <string.h>
+#include <prodcons.h>
+
 /*------------------------------------------------------------------------
  * xsh_hello
  *------------------------------------------------------------------------
@@ -16,6 +18,7 @@ shellcmd xsh_hello(int nargs, char *args[])
 		printf("Options:\n");
         printf("\tusername\t username to be displayed in the welcome dialogue\n");
 		printf("\t--help\t display this help and exit\n");
+		signal(spawnrun);
 		return 0;
 	}
 
@@ -33,7 +36,7 @@ shellcmd xsh_hello(int nargs, char *args[])
         printf("Hello %s, Welcome to the world of Xinu!!\n",args[1]);
     }
 
-	printf("\n");
-
+	//printf("\n");
+	signal(spawnrun);
 	return 0;
 }
