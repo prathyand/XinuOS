@@ -2,8 +2,58 @@
 #include <stdio.h>
 #include <shprototypes.h>
 #include <prodcons.h>
+#include <future_prodcons.h>
+#include <future.h>
+
+void future_prodcons(int nargs, char *args[]) {
+
+  print_sem = semcreate(1);
+  future_t* f_exclusive;
+  f_exclusive = future_alloc(FUTURE_EXCLUSIVE, sizeof(int), 1);
+  char *val;
+  int i;
+  i=2;
+  while (i < nargs) {
+        if ((strcmp(args[i], "s") == 0) || (atoi(args[i])!=0) || (strcmp(args[i], "g") == 0) ){
+          i++;
+        }  
+        else{               
+        printf("Syntax: run futest [-pc [g ...] [s VALUE ...]|-f]\n");
+        signal(spawnrun);
+        return 1;   
+        }                 
+    
+  }
+
+  int num_args = i;  
+  i = 2; 
+  val  =  (char *) getmem(num_args); 
+
+  // Iterate again through the arguments and create the following processes based on the passed argument ("g" or "s VALUE")
+  while (i < nargs) {
+    if (strcmp(args[i], "g") == 0) {
+      char id[10];
+      sprintf(id, "fcons%d",i);
+      resume(create(future_cons, 2048, 20, id, 1, f_exclusive));
+    }
+    if (strcmp(args[i], "s") == 0) {
+      i++;
+      uint8 number = atoi(args[i]);
+      val[i] = number;
+      resume(create(future_prod, 2048, 20, "fprod1", 2, f_exclusive, &val[i]));
+      sleepms(5);
+    }
+    i++;
+  }
+  sleepms(100);
+  future_free(f_exclusive);
+  signal(spawnrun);
+  return OK;
+}
+
+
 shellcmd xsh_run(int nargs, char *args[]) {
-char *funcs[50]={"hello","list","prodcons","prodcons_bb"};
+char *funcs[50]={"hello","list","prodcons","prodcons_bb","futest"};
 int funclength,i;
 i=0;
 
@@ -44,9 +94,17 @@ if(strncmp(args[0], "prodcons", 8) == 0) {
   wait(spawnrun);
   return OK;
 }
-
-
-
+if(strncmp(args[0], "futest" ,  6)==0){
+        if(nargs<=3){
+            printf("Syntax: run futest [-pc [g ...] [s VALUE ...]|-f]\n");
+            return 0;
+        }
+        else {
+            resume(create(future_prodcons, 4096, 20, "future_prodcons", 2,nargs, args));
+            wait(spawnrun);
+            return 1;
+        }
+    }
 for(i=0;i<funclength;i++){
         printf("%s\n",funcs[i]);
     }

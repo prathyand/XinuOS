@@ -49,7 +49,7 @@ typedef	int32	status;		/* returned status value (OK/SYSERR)	*/
 
 /* Universal return constants */
 
-#define OK	( 1)		/* normal system call return		*/
+#define OK	(1)		/* normal system call return		*/
 #define	SYSERR	(-1)		/* system call failed			*/
 #define	EOF	(-2)		/* End-of-file (usually from read)	*/
 #define	TIMEOUT	(-3)		/* system call timed out		*/
