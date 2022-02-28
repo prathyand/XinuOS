@@ -32,6 +32,35 @@ if((nargs==1) || (strncmp(args[1], "list", 4) == 0)){
 args++;
 nargs--;
 
+if(strncmp(args[0], "futest" ,  6)==0){
+  
+
+  if(strncmp(args[1], "--pc" ,  4)==0){
+    if(nargs<=3){
+      printf("Syntax: run futest [-pc [g ...] [s VALUE ...]|-f]\n");
+      return 1;
+    }
+    else {
+      future_prodcons(nargs, args);
+      return 0;
+    }
+  }
+
+  if(strncmp(args[1], "-f" ,  3)==0){
+    if(nargs<3){
+    printf("Syntax: run futest [-pc [g ...] [s VALUE ...]|-f NUMBER][--free]");
+    return 1;
+    }
+    future_fib(nargs, args);
+    return 0;
+  }
+  if(strncmp(args[1], "--free" ,  6)==0){
+    future_free_test(nargs, args);
+    return 0;
+  }
+  
+}
+
 if(strncmp(args[0], "hello", 5) == 0) {
   /* create a process with the function as an entry point. */
   resume (create((void *) xsh_hello, 4096, 20, "hello", 2, nargs, args));
@@ -52,33 +81,7 @@ if(strncmp(args[0], "prodcons", 8) == 0) {
   wait(spawnrun);
   return OK;
 }
-if(strncmp(args[0], "futest" ,  6)==0){
-  if(nargs<3){
-    printf("Syntax: run futest [-pc [g ...] [s VALUE ...]|-f NUMBER][--free]");
-    return 1;
-  }
 
-  if(strncmp(args[1], "--pc" ,  4)==0){
-    if(nargs<=3){
-      printf("Syntax: run futest [-pc [g ...] [s VALUE ...]|-f]\n");
-      return 1;
-    }
-    else {
-      future_prodcons(nargs, args);
-      return 0;
-    }
-  }
-
-  if(strncmp(args[1], "--f" ,  3)==0){
-    future_fib(nargs, args);
-    return 0;
-  }
-  if(strncmp(args[1], "--free" ,  6)==0){
-    future_free_test(nargs, args);
-    return 0;
-  }
-  
-}
 
 for(i=0;i<funclength;i++){
         printf("%s\n",funcs[i]);

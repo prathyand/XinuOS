@@ -49,9 +49,7 @@ syscall future_free(future_t* f){
     if(f->pid !=NULL){
         kill(f->pid);
     }
-    else{
-        return SYSERR;
-    }
+    
     freemem(f->data,f->size);
     freemem(f,sizeof(future_t));
     restore(mask);
