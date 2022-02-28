@@ -48,17 +48,23 @@ if(strncmp(args[0], "futest" ,  6)==0){
 
   if(strncmp(args[1], "-f" ,  3)==0){
     if(nargs<3){
-    printf("Syntax: run futest [-pc [g ...] [s VALUE ...]|-f NUMBER][--free]");
+    printf("Syntax: run futest [-pc [g ...] [s VALUE ...]|-f NUMBER][--free]\n");
     return 1;
     }
     future_fib(nargs, args);
     return 0;
   }
   if(strncmp(args[1], "--free" ,  6)==0){
+    if(nargs>=3){
+    printf("Syntax: run futest [-pc [g ...] [s VALUE ...]|-f NUMBER][--free]\n");
+    return 1;
+    }
     future_free_test(nargs, args);
     return 0;
   }
-  
+
+  printf("Syntax: run futest [-pc [g ...] [s VALUE ...]|-f NUMBER][--free]\n");
+  return 1;
 }
 
 if(strncmp(args[0], "hello", 5) == 0) {
