@@ -1,10 +1,12 @@
 #include <xinu.h>
 #include <prodcons.h>
 #include <prodcons_bb.h>
+#include <runcmd.h>
 int n;
 int maxcons;
 int arr_q[5];
 int tail;
+sid32 spawnrun;
 void consumer(int count) {
   // TODO: implement the following:
   // - Iterates from 0 to count (count including)

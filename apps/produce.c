@@ -1,9 +1,11 @@
 #include <xinu.h>
 #include <prodcons.h>
 #include <prodcons_bb.h>
+#include <runcmd.h>
 int n;
 int maxcons;
 int arr_q[5];
+sid32 spawnrun;
 int head;
 void producer(int count) {
   // TODO: implement the following:

@@ -4,7 +4,9 @@
 #include <prodcons.h>
 #include <stdio.h>
 #include <shprototypes.h>
+#include <runcmd.h>
 int maxcons;
+sid32 spawnrun;
 shellcmd xsh_prodcons_bb(int nargs, char *args[]) {
     int arr_q[5];
     int head=0;

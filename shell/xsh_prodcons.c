@@ -2,8 +2,9 @@
 #include <prodcons.h>
 #include <stdio.h>
 #include <shprototypes.h>
+#include <runcmd.h>
 int n; // Definition for global variable 'n'
-            
+sid32 spawnrun;
 /* Now global variable n is accessible by all the processes i.e. consume and produce */
 
 shellcmd xsh_prodcons(int nargs, char *args[]) {

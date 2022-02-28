@@ -4,11 +4,12 @@
 #include <stdio.h>
 #include <string.h>
 #include <prodcons.h>
-
+#include <runcmd.h>
 /*------------------------------------------------------------------------
  * xsh_hello
  *------------------------------------------------------------------------
  */
+sid32 spawnrun;
 shellcmd xsh_hello(int nargs, char *args[])
 {
 	if (nargs == 2 && strncmp(args[1], "--help", 7) == 0) {
