@@ -21,7 +21,12 @@ typedef struct data_element {
 int num_streams,work_queue_depth,time_window,output_time;
 int32 processexitcount=0;
 // sid32 allconsexited;
-int32 msgQ;
+int32 *msgQ;
+
+// function to disopse the msg in the port being deleted 
+void disposemsg(int32 portmsg){
+    portmsg=0;
+}
 
 void stream_consumer(int32 id, struct stream * str) {
     int procid=getpid();
@@ -82,7 +87,7 @@ void stream_consumer(int32 id, struct stream * str) {
     // freemem(str,sizeof(struct stream));
     processexitcount++;
     kprintf("stream_consumer exiting\n");
-    ptsend(msgQ,procid);
+    ptsend(msgQ[id],procid);
     
     // if(processexitcount==num_streams){
     //     signal(allconsexited);
@@ -146,12 +151,12 @@ int stream_proc(int nargs, char * args[]) {
     //     strms[i] = (struct stream*)getmem(sizeof(struct stream));
     // }
 
-    // msgQ = (int32 *)getmem(num_streams*sizeof(int32));
+    msgQ = (int32 *)getmem(num_streams*sizeof(int32));
 
-    msgQ = ptcreate(num_streams);
-    // for (i = 0; i < num_streams; i++) {
-    //     msgQ[i]=ptcreate(1);
-    // }
+    // msgQ = ptcreate(num_streams);
+    for (i = 0; i < num_streams; i++) {
+        msgQ[i]=ptcreate(1);
+    }
     
     
     // TODO: Create consumer processes and initialize streams
@@ -210,15 +215,18 @@ int stream_proc(int nargs, char * args[]) {
     for (i = 0; i < num_streams; i++) {
         int peid;
         // printf("waiting for process i%d\n",i);
-        peid=ptrecv(msgQ);
+        peid=ptrecv(msgQ[i]);
+        ptdelete(msgQ[i],*disposemsg);
         printf("process %d exited\n",peid);
     }
     
     // TODO: Measure the time of this entire function and report it at the end
     time = (((clktime * 1000) + clkticks) - ((secs * 1000) + msecs));
     printf("time in ms: %u\n", time);
+
+    
     // freemem(strms,num_streams*sizeof(struct stream*));
-    // freemem(msgQ,num_streams*sizeof(int32));
+    freemem(msgQ,num_streams*sizeof(int32));
     signal(spawnrun);
     return OK;
 }
