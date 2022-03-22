@@ -21,7 +21,7 @@ typedef struct data_element {
 int num_streams,work_queue_depth,time_window,output_time;
 int32 processexitcount=0;
 // sid32 allconsexited;
-int32 *msgQ;
+int32 msgQ;
 
 void stream_consumer(int32 id, struct stream * str) {
     int procid=getpid();
@@ -39,10 +39,14 @@ void stream_consumer(int32 id, struct stream * str) {
         timeVar=str->queue[str->tail].time;
         valVar=str->queue[str->tail].value;
         // kprintf("time val at C %d %d %d\n",id,timeVar,valVar);
-        
-        
         countime++;
-        
+
+        if(timeVar==0 && valVar==0){
+            signal(str->mutex);
+            signal(str->spaces);
+            break;
+        }
+
         tscdf_update(tcpt,timeVar,valVar);
 
         if(countime%output_time==0){ 
@@ -66,13 +70,7 @@ void stream_consumer(int32 id, struct stream * str) {
         signal(str->mutex);
         // kprintf("C-Rs: %d,%d <S%d I%d M%d>\n",id,procid,semcount(str->spaces),semcount(str->items),semcount(str->mutex));
         signal(str->spaces);
-        
-        if(timeVar==0 && valVar==0){
-            break;
-        }
-        
-        
-        
+
     }
 
     tscdf_free(tcpt);
@@ -80,27 +78,20 @@ void stream_consumer(int32 id, struct stream * str) {
     semdelete(str->spaces);
     semdelete(str->items);
     semdelete(str->mutex);
-    // freemem(str->queue,work_queue_depth*sizeof(struct data_element));
+    freemem(str->queue,work_queue_depth*sizeof(struct data_element));
     // freemem(str,sizeof(struct stream));
     processexitcount++;
     kprintf("stream_consumer exiting\n");
+    ptsend(msgQ,procid);
     
-    
-    ptsend(msgQ[id],procid);
-    
-    if(processexitcount==num_streams){
-        // signal(allconsexited);
-    }
-    return OK;
-
+    // if(processexitcount==num_streams){
+    //     signal(allconsexited);
+    // }
 }
 
 int stream_proc(int nargs, char * args[]) {
     
-    // time calc
-    ulong secs, msecs, time;
-    secs = clktime;
-    msecs = clkticks;
+    
     // allconsexited = semcreate(0);
     // TODO: Parse arguments
     char usage[] = "Usage: run tscdf -s <num_streams> -w <work_queue_depth> -t <time_window> -o <output_time>\n";
@@ -142,6 +133,11 @@ int stream_proc(int nargs, char * args[]) {
     }
     }
     
+    // time calc
+    ulong secs, msecs, time;
+    secs = clktime;
+    msecs = clkticks;
+
     // TODO: Create streams
     // struct stream **strms = (struct stream**)getmem(sizeof(struct stream*)*num_streams);
     struct stream strms[num_streams];
@@ -150,12 +146,12 @@ int stream_proc(int nargs, char * args[]) {
     //     strms[i] = (struct stream*)getmem(sizeof(struct stream));
     // }
 
-    msgQ = (int32 *)getmem(num_streams*sizeof(int32));
+    // msgQ = (int32 *)getmem(num_streams*sizeof(int32));
 
-
-    for (i = 0; i < num_streams; i++) {
-        msgQ[i]=ptcreate(1);
-    }
+    msgQ = ptcreate(num_streams);
+    // for (i = 0; i < num_streams; i++) {
+    //     msgQ[i]=ptcreate(1);
+    // }
     
     
     // TODO: Create consumer processes and initialize streams
@@ -214,7 +210,7 @@ int stream_proc(int nargs, char * args[]) {
     for (i = 0; i < num_streams; i++) {
         int peid;
         // printf("waiting for process i%d\n",i);
-        peid=ptrecv(msgQ[i]);
+        peid=ptrecv(msgQ);
         printf("process %d exited\n",peid);
     }
     
@@ -222,6 +218,7 @@ int stream_proc(int nargs, char * args[]) {
     time = (((clktime * 1000) + clkticks) - ((secs * 1000) + msecs));
     printf("time in ms: %u\n", time);
     // freemem(strms,num_streams*sizeof(struct stream*));
+    // freemem(msgQ,num_streams*sizeof(int32));
     signal(spawnrun);
     return OK;
 }

@@ -92,7 +92,7 @@ if(strncmp(args[0], "prodcons", 8) == 0) {
 }
 
 if(strncmp(args[0], "tscdf" ,  5)==0){
-  resume (create((void *) stream_proc, 4096, 20, "stream_proc", 2, nargs, args));
+  resume (create((void *) stream_proc, 1024, 20, "stream_proc", 2, nargs, args));
   // stream_proc(nargs, args);
   wait(spawnrun);
   return OK;
