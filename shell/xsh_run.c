@@ -73,6 +73,7 @@ if(strncmp(args[0], "hello", 5) == 0) {
   /* create a process with the function as an entry point. */
   resume (create((void *) xsh_hello, 1024, 20, "hello", 2, nargs, args));
   wait(spawnrun);
+  semdelete(spawnrun);
   return 1;
 }
 

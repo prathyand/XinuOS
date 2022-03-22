@@ -77,7 +77,9 @@ void stream_consumer(int32 id, struct stream * str) {
 
     tscdf_free(tcpt);
 
-    
+    semdelete(str->spaces);
+    semdelete(str->items);
+    semdelete(str->mutex);
     // freemem(str->queue,work_queue_depth*sizeof(struct data_element));
     // freemem(str,sizeof(struct stream));
     processexitcount++;
