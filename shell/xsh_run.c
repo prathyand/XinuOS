@@ -9,9 +9,10 @@
 sid32 spawnrun;
  int future_fib(int nargs, char *args[]);
  int future_free_test(int nargs, char *args[]);
+ int stream_proc(int nargs, char * args[]);
 
 shellcmd xsh_run(int nargs, char *args[]) {
-char *funcs[50]={"hello","list","prodcons","prodcons_bb","futest"};
+char *funcs[50]={"futest","hello","list","prodcons","prodcons_bb","tscdf"};
 int funclength,i;
 i=0;
 
@@ -69,7 +70,7 @@ if(strncmp(args[0], "futest" ,  6)==0){
 
 if(strncmp(args[0], "hello", 5) == 0) {
   /* create a process with the function as an entry point. */
-  resume (create((void *) xsh_hello, 4096, 20, "hello", 2, nargs, args));
+  resume (create((void *) xsh_hello, 1024, 20, "hello", 2, nargs, args));
   wait(spawnrun);
   return OK;
 }
@@ -85,6 +86,13 @@ if(strncmp(args[0], "prodcons", 8) == 0) {
   /* create a process with the function as an entry point. */
   resume (create((void *) xsh_prodcons, 4096, 20, "prodcons", 2, nargs, args));
   wait(spawnrun);
+  return OK;
+}
+
+if(strncmp(args[0], "tscdf" ,  5)==0){
+  // resume (create((void *) stream_proc, 4096, 20, "stream_proc", 2, nargs, args));
+  stream_proc(nargs, args);
+  // wait(spawnrun);
   return OK;
 }
 
