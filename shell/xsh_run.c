@@ -12,7 +12,7 @@ sid32 spawnrun;
  int stream_proc(int nargs, char * args[]);
 
 shellcmd xsh_run(int nargs, char *args[]) {
-char *funcs[50]={"futest","hello","list","prodcons","prodcons_bb","tscdf"};
+char *funcs[50]={"hello","list","prodcons","prodcons_bb","futest","tscdf"};
 int funclength,i;
 i=0;
 
