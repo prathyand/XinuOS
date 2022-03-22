@@ -25,7 +25,7 @@ int32 *msgQ;
 
 void stream_consumer(int32 id, struct stream * str) {
     int procid=getpid();
-    printf("stream_consumer id:%d (pid:%d)\n",id,procid);
+    kprintf("stream_consumer id:%d (pid:%d)\n",id,procid);
     struct tscdf* tcpt= tscdf_init(time_window);
     int32 countime=0;
     // TODO: Consume all values from the work queue of the corresponding stream
@@ -103,41 +103,42 @@ int stream_proc(int nargs, char * args[]) {
     allconsexited = semcreate(0);
     // TODO: Parse arguments
     char usage[] = "Usage: run tscdf -s <num_streams> -w <work_queue_depth> -t <time_window> -o <output_time>\n";
+
     int i;
-    char * ch, c;
+    char *ch, c;
     if (nargs != 9) {
-        printf("%s", usage);
-        return SYSERR;
+    printf("%s", usage);
+    return SYSERR;
     } else {
-        i = nargs - 1;
-        while (i > 0) {
-            ch = args[i - 1];
-            c = * (++ch);
+    i = nargs - 1;
+    while (i > 0) {
+        ch = args[i - 1];
+        c = *(++ch);
 
-            switch (c) {
-            case 's':
-                num_streams = atoi(args[i]);
-                break;
+        switch (c) {
+        case 's':
+            num_streams = atoi(args[i]);
+            break;
 
-            case 'w':
-                work_queue_depth = atoi(args[i]);
-                break;
+        case 'w':
+            work_queue_depth = atoi(args[i]);
+            break;
 
-            case 't':
-                time_window = atoi(args[i]);
-                break;
+        case 't':
+            time_window = atoi(args[i]);
+            break;
 
-            case 'o':
-                output_time = atoi(args[i]);
-                break;
+        case 'o':
+            output_time = atoi(args[i]);
+            break;
 
-            default:
-                printf("%s", usage);
-                return SYSERR;
-            }
-
-            i -= 2;
+        default:
+            printf("%s", usage);
+            return SYSERR;
         }
+
+        i -= 2;
+    }
     }
     
     // TODO: Create streams
