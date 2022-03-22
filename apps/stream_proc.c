@@ -20,7 +20,7 @@ typedef struct data_element {
     };
 int num_streams,work_queue_depth,time_window,output_time;
 int32 processexitcount=0;
-sid32 allconsexited;
+// sid32 allconsexited;
 int32 *msgQ;
 
 void stream_consumer(int32 id, struct stream * str) {
@@ -88,7 +88,7 @@ void stream_consumer(int32 id, struct stream * str) {
     ptsend(msgQ[id],procid);
     
     if(processexitcount==num_streams){
-        signal(allconsexited);
+        // signal(allconsexited);
     }
     return OK;
 
@@ -100,7 +100,7 @@ int stream_proc(int nargs, char * args[]) {
     ulong secs, msecs, time;
     secs = clktime;
     msecs = clkticks;
-    allconsexited = semcreate(0);
+    // allconsexited = semcreate(0);
     // TODO: Parse arguments
     char usage[] = "Usage: run tscdf -s <num_streams> -w <work_queue_depth> -t <time_window> -o <output_time>\n";
 
@@ -205,7 +205,7 @@ int stream_proc(int nargs, char * args[]) {
         
     }
     // kprintf("done producing\n");
-    wait(allconsexited);
+    // wait(allconsexited);
 
     // TODO: Join all launched consumer processes
     for (i = 0; i < num_streams; i++) {
