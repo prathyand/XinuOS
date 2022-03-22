@@ -12,6 +12,7 @@ sid32 spawnrun;
  int stream_proc(int nargs, char * args[]);
 
 shellcmd xsh_run(int nargs, char *args[]) {
+
 char *funcs[50]={"hello","list","prodcons","prodcons_bb","futest","tscdf"};
 int funclength,i;
 i=0;
@@ -72,7 +73,7 @@ if(strncmp(args[0], "hello", 5) == 0) {
   /* create a process with the function as an entry point. */
   resume (create((void *) xsh_hello, 1024, 20, "hello", 2, nargs, args));
   wait(spawnrun);
-  return OK;
+  return 1;
 }
 
 if(strncmp(args[0], "prodcons_bb", 11) == 0) {
@@ -90,9 +91,9 @@ if(strncmp(args[0], "prodcons", 8) == 0) {
 }
 
 if(strncmp(args[0], "tscdf" ,  5)==0){
-  // resume (create((void *) stream_proc, 4096, 20, "stream_proc", 2, nargs, args));
-  stream_proc(nargs, args);
-  // wait(spawnrun);
+  resume (create((void *) stream_proc, 4096, 20, "stream_proc", 2, nargs, args));
+  // stream_proc(nargs, args);
+  wait(spawnrun);
   return OK;
 }
 
@@ -100,5 +101,6 @@ if(strncmp(args[0], "tscdf" ,  5)==0){
 for(i=0;i<funclength;i++){
         printf("%s\n",funcs[i]);
     }  
+    return 1;
 
 }

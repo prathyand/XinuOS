@@ -78,8 +78,8 @@ void stream_consumer(int32 id, struct stream * str) {
     tscdf_free(tcpt);
 
     
-    freemem(str->queue,work_queue_depth*sizeof(struct data_element));
-    freemem(str,sizeof(struct stream));
+    // freemem(str->queue,work_queue_depth*sizeof(struct data_element));
+    // freemem(str,sizeof(struct stream));
     processexitcount++;
     kprintf("stream_consumer exiting\n");
     
@@ -141,10 +141,12 @@ int stream_proc(int nargs, char * args[]) {
     }
     
     // TODO: Create streams
-    struct stream **strms = (struct stream**)getmem(sizeof(struct stream*)*num_streams);
-    for (i=0;i<num_streams;i++){
-        strms[i] = (struct stream*)getmem(sizeof(struct stream));
-    }
+    // struct stream **strms = (struct stream**)getmem(sizeof(struct stream*)*num_streams);
+    struct stream strms[num_streams];
+    struct stream *stps=strms;
+    // for (i=0;i<num_streams;i++){
+    //     strms[i] = (struct stream*)getmem(sizeof(struct stream));
+    // }
 
     msgQ = (int32 *)getmem(num_streams*sizeof(int32));
 
@@ -158,13 +160,13 @@ int stream_proc(int nargs, char * args[]) {
     // Use `i` as the stream id.
     for (i = 0; i < num_streams; i++) {
 
-        strms[i]->queue = (struct data_element*)getmem(work_queue_depth*sizeof(struct data_element));
-        strms[i]->head=0;
-        strms[i]->tail=0;
-        strms[i]->spaces=semcreate(work_queue_depth);
-        strms[i]->items=semcreate(0);
-        strms[i]->mutex=semcreate(1);
-        resume(create((void *) stream_consumer, 1024, 20, "stream_consumer", 2, i,strms[i]));
+        strms[i].queue = (struct data_element*)getmem(work_queue_depth*sizeof(struct data_element));
+        strms[i].head=0;
+        strms[i].tail=0;
+        strms[i].spaces=semcreate(work_queue_depth);
+        strms[i].items=semcreate(0);
+        strms[i].mutex=semcreate(1);
+        resume(create((void *) stream_consumer, 1024, 20, "stream_consumer", 2, i,(stps+i)));
     }
 
 
@@ -183,23 +185,23 @@ int stream_proc(int nargs, char * args[]) {
         //     kprintf("last input for i: %d\n",st);
         // }
         // kprintf("P-Ls: %d <S%d I%d M%d>\n",st,semcount(strms[st]->spaces),semcount(strms[st]->items),semcount(strms[st]->mutex));
-        wait(strms[st]->spaces);
+        wait(strms[st].spaces);
         // kprintf("P-Lm: %d <S%d I%d M%d>\n",st,semcount(strms[st]->spaces),semcount(strms[st]->items),semcount(strms[st]->mutex));
-        wait(strms[st]->mutex);
+        wait(strms[st].mutex);
         
         // printf("strms[st]->spaces done\n");
         
         // printf("strms[st]->mutex done\n");
-        strms[st]->queue[strms[st]->head].time=ts;
-        strms[st]->queue[strms[st]->head].value=v;
-        strms[st]->head++;
-        if(strms[st]->head==work_queue_depth){
-            strms[st]->head=0;
+        strms[st].queue[strms[st].head].time=ts;
+        strms[st].queue[strms[st].head].value=v;
+        strms[st].head++;
+        if(strms[st].head==work_queue_depth){
+            strms[st].head=0;
         }
         // kprintf("P-Rm: %d <S%d I%d M%d>\n",st,semcount(strms[st]->spaces),semcount(strms[st]->items),semcount(strms[st]->mutex));
-        signal(strms[st]->mutex);
+        signal(strms[st].mutex);
         // kprintf("P-Ri: %d <S%d I%d M%d>\n",st,semcount(strms[st]->spaces),semcount(strms[st]->items),semcount(strms[st]->mutex));
-        signal(strms[st]->items);
+        signal(strms[st].items);
         
         
     }
@@ -217,5 +219,7 @@ int stream_proc(int nargs, char * args[]) {
     // TODO: Measure the time of this entire function and report it at the end
     time = (((clktime * 1000) + clkticks) - ((secs * 1000) + msecs));
     printf("time in ms: %u\n", time);
+    // freemem(strms,num_streams*sizeof(struct stream*));
+    signal(spawnrun);
     return OK;
 }

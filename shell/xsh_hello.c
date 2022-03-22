@@ -39,5 +39,5 @@ shellcmd xsh_hello(int nargs, char *args[])
 
 	//printf("\n");
 	signal(spawnrun);
-	return 0;
+	return OK;
 }
