@@ -42,7 +42,6 @@ void stream_consumer(int32 id, struct stream * str) {
         
         
         countime++;
-        char* output;
         
         tscdf_update(tcpt,timeVar,valVar);
 
@@ -51,7 +50,7 @@ void stream_consumer(int32 id, struct stream * str) {
 
             if (qarray == NULL) {
             kprintf("tscdf_quartiles returned NULL\n");
-            break;
+            continue;
             }
 
             kprintf("s%d: %d %d %d %d %d\n", id, qarray[0], qarray[1], qarray[2], qarray[3], qarray[4]);
