@@ -1,6 +1,6 @@
 #include <xinu.h>
 
-extern const char *stream_input[];
+// extern const char *stream_input[];
 extern int32 n_input;
 
 struct tscdf_element {
