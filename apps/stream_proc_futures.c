@@ -1,7 +1,7 @@
 #include <xinu.h>
+#include "tscdf_input.h"
 #include <future.h>
 #include "tscdf.h"
-#include "tscdf_input.h"
 #include <runcmd.h>
 
 sid32 spawnrun;
@@ -178,6 +178,8 @@ int stream_proc_futures(int nargs, char* args[]) {
     freemem(futures,sizeof(future_t*)*num_streams);
     freemem(msgQ,num_streams*sizeof(int32));
   // TODO: Measure the time of this entire function and report it at the end
+    time = (((clktime * 1000) + clkticks) - ((secs * 1000) + msecs));
+    kprintf("time in ms: %u\n", time);
     signal(spawnrun);
     return 0;
 }
