@@ -10,7 +10,13 @@ sid32 print_sem;
 void future_prodcons(int nargs, char *args[]) {
   print_sem = semcreate(1);
   future_t* f_exclusive;
-  f_exclusive = future_alloc(FUTURE_EXCLUSIVE, sizeof(int), 1);
+  if(strncmp(args[1], "-pcq" ,4)==0){
+    // kprintf("fut mode Queue, maxelem %s\n",atoi(args[2]));
+    f_exclusive = future_alloc(FUTURE_QUEUE, sizeof(int), atoi(args[2]));
+  }else{
+    f_exclusive = future_alloc(FUTURE_EXCLUSIVE, sizeof(int), 1);
+  }
+  
   char *val;
   int i;
   i=2;
@@ -19,7 +25,8 @@ void future_prodcons(int nargs, char *args[]) {
           i++;
         }  
         else{               
-        printf("Syntax: run futest [-pc [g ...] [s VALUE ...]|-f]\n");
+        printf("Syntax: run futest [-pc [g ...] [s VALUE ...]] | [-pcq LENGTH [g ...] [s VALUE ...]] | [-f NUMBER] | [--free]\n");
+        future_free(f_exclusive);
         return 1;   
         }                 
     
