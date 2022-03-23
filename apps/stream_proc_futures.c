@@ -1,7 +1,7 @@
 #include <xinu.h>
 #include "tscdf_input.h"
 #include <future.h>
-#include "tscdf.h"
+#include "tscdf_copy.h"
 #include <runcmd.h>
 
 sid32 spawnrun;
