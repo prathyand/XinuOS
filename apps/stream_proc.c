@@ -1,9 +1,9 @@
 #include <xinu.h>
 #include "tscdf.h"
-#include "tscdf_input_stream.h"
+#include "tscdf_input.h"
 #include <runcmd.h>
 sid32 spawnrun;
-
+int n_input = number_inputs;
 typedef struct data_element {
         int32 time;
         int32 value;
@@ -160,9 +160,9 @@ int stream_proc(int nargs, char * args[]) {
     // TODO: Parse input header file data and populate work queue
     char* a;
     int st,ts,v,j;
-    for(j=0;j<number_inputs3;j++){
+    for(j=0;j<number_inputs;j++){
         
-        a = (char *) stream_input3[j];
+        a = (char *) stream_input[j];
         st = atoi(a);
         while (*a++ != '\t');
         ts = atoi(a);
