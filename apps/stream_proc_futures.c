@@ -1,10 +1,9 @@
 #include <xinu.h>
 #include <stdlib.h>
 #include "tscdf.h"
-#include "tscdf_input.h"
+#include "tscdf_input_future.h"
 #include <future.h>
 #include <runcmd.h>
-
 sid32 spawnrun;
 
 typedef struct data_element {
@@ -145,8 +144,8 @@ int stream_proc_futures(int nargs, char* args[]) {
   // TODO: Parse input header file data and populate work queue
     char* a;
     int st,ts,v,j;
-    for(j=0;j<number_inputs;j++){
-        a = (char *) stream_input[j];
+    for(j=0;j<number_inputs2;j++){
+        a = (char *) stream_input2[j];
         st = atoi(a);
         while (*a++ != '\t');
         ts = atoi(a);

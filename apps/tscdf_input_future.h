@@ -1,5 +1,5 @@
-#define number_inputs3 (sizeof (stream_input3) / sizeof (const char *))
-const char *stream_input3[] = {\
+#define number_inputs2 (sizeof (stream_input2) / sizeof (const char *))
+const char *stream_input2[] = {\
 "9\t9\t35",\
 "5\t17\t31",\
 "2\t24\t16",\
