@@ -58,7 +58,7 @@ syscall future_free(future_t* f){
         }
         delqueue(f->get_queue);
         freemem(f->data,f->size);
-        freemem(f,sizeof(future_t));
+        freemem((char*)f,sizeof(future_t));
         restore(mask);
         return OK;
     }
@@ -81,12 +81,12 @@ syscall future_free(future_t* f){
         delqueue(f->get_queue);
         delqueue(f->set_queue);
         freemem(f->data,f->size*f->max_elems);
-        freemem(f,sizeof(future_t));
+        freemem((char*)f,sizeof(future_t));
         restore(mask);
         return OK;
     }
   
-    freemem(f,sizeof(future_t));
+    freemem((char*)f,sizeof(future_t));
     restore(mask);
     return SYSERR;
 }

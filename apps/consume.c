@@ -24,7 +24,7 @@ void consumer(int count) {
 
 }
 
-void consumer_bb(int id, int count) {
+int consumer_bb(int id, int count) {
   // TODO: implement the following:
   // - Iterate from 0 to count (count excluding)
   //   - read the next available value from the global array `arr_q`

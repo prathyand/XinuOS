@@ -21,7 +21,7 @@ void producer(int count) {
   }
 }
 
-void producer_bb(int id, int count) {
+int producer_bb(int id, int count) {
   // TODO: implement the following:
   // - Iterate from 0 to count (count excluding)
   //   - add iteration value to the global array `arr_q`

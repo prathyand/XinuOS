@@ -1,5 +1,5 @@
-
 #include <xinu.h>
+#include <stdlib.h>
 #include <prodcons_bb.h>
 #include <prodcons.h>
 #include <stdio.h>
@@ -8,9 +8,9 @@
 int maxcons;
 sid32 spawnrun;
 shellcmd xsh_prodcons_bb(int nargs, char *args[]) {
-    int arr_q[5];
-    int head=0;
-    int tail=0;
+    // int arr_q[5];
+    // int head=0;
+    // int tail=0;
     mutex=semcreate(1);
     mutex2=semcreate(0);
     finallydone=semcreate(0);

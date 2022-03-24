@@ -1,7 +1,8 @@
 #include <xinu.h>
+#include <stdlib.h>
+#include "tscdf.h"
 #include "tscdf_input.h"
 #include <future.h>
-#include "tscdf_copy.h"
 #include <runcmd.h>
 
 sid32 spawnrun;
@@ -15,9 +16,10 @@ typedef struct data_element {
 int32 num_streams,work_queue_depth,time_window,output_time,*msgQ;
 
 // function to dispose the msg in the port being deleted 
-void disposemsg_futures(int32 portmsg){
+int disposemsg_futures(int32 portmsg){
     // used for ptdelete()
     portmsg=0;
+    return 1;
 }
 
 void stream_consumer_future(int32 id, future_t *f) {
@@ -28,10 +30,10 @@ void stream_consumer_future(int32 id, future_t *f) {
     int32 countime=0;
     // TODO: Consume all values from the work queue of the corresponding stream
     while(1==1){
-        struct data_element * elem;
+        struct data_element * elem = (struct data_element *)getmem(sizeof(de));
         // wait(str->items);
         // wait(str->mutex);
-        future_get(f,elem);
+        future_get(f,(char*)elem);
         
         int32 timeVar,valVar;
         timeVar=elem->time;
@@ -57,6 +59,7 @@ void stream_consumer_future(int32 id, future_t *f) {
             freemem((char *) qarray, (6*sizeof(int32)));
         }
 
+        freemem((char*)elem,sizeof(de));
         // str->tail++;
         // if(str->tail==work_queue_depth){
         // str->tail=0; 
@@ -150,12 +153,12 @@ int stream_proc_futures(int nargs, char* args[]) {
         while (*a++ != '\t');
         v = atoi(a);
         
-        struct data_element * elem;
+        struct data_element * elem = (struct data_element *)getmem(sizeof(de));
         elem->time=ts;
         elem->value=v;
 
-        future_set(futures[st],elem);
-
+        future_set(futures[st],(char*)elem);
+        freemem((char*)elem,sizeof(de));
         // strms[st]->queue[strms[st]->head].time=ts;
         // strms[st]->queue[strms[st]->head].value=v;
         // strms[st]->head++;
@@ -175,8 +178,8 @@ int stream_proc_futures(int nargs, char* args[]) {
     }
 
   // TODO: Free all futures
-    freemem(futures,sizeof(future_t*)*num_streams);
-    freemem(msgQ,num_streams*sizeof(int32));
+    freemem((char*)futures,sizeof(future_t*)*num_streams);
+    freemem((char*)msgQ,num_streams*sizeof(int32));
   // TODO: Measure the time of this entire function and report it at the end
     time = (((clktime * 1000) + clkticks) - ((secs * 1000) + msecs));
     kprintf("time in ms: %u\n", time);

@@ -1,4 +1,5 @@
 #include <xinu.h>
+#include <stdlib.h>
 #include <prodcons.h>
 #include <stdio.h>
 #include <shprototypes.h>

@@ -1,4 +1,5 @@
 #include <xinu.h>
+#include <stdlib.h>
 #include <future.h>
 #include <stddef.h>
 #include <future_prodcons.h>
@@ -7,7 +8,7 @@ sid32 print_sem;
  int future_fib(int nargs, char *args[]);
  int future_free_test(int nargs, char *args[]);
 
-void future_prodcons(int nargs, char *args[]) {
+int future_prodcons(int nargs, char *args[]) {
   print_sem = semcreate(1);
   future_t* f_exclusive;
   if(strncmp(args[1], "-pcq" ,4)==0){

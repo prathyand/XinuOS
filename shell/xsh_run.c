@@ -1,10 +1,12 @@
 #include <xinu.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <shprototypes.h>
 #include <prodcons.h>
 #include <future_prodcons.h>
 #include <future.h>
 #include <runcmd.h>
+
 
 sid32 spawnrun;
  int future_fib(int nargs, char *args[]);
@@ -13,7 +15,7 @@ sid32 spawnrun;
  int stream_proc_futures(int nargs, char* args[]);
 shellcmd xsh_run(int nargs, char *args[]) {
 
-char *funcs[50]={"hello","list","prodcons","prodcons_bb","futest","tscdf_fq"};
+char *funcs[50]={"hello","list","prodcons","prodcons_bb","futest","tscdf","tscdf_fq"};
 int funclength,i;
 i=0;
 
@@ -100,19 +102,21 @@ if(strncmp(args[0], "prodcons", 8) == 0) {
   return OK;
 }
 
-// if(strncmp(args[0], "tscdf" ,  5)==0){
-//   resume (create((void *) stream_proc, 1024, 20, "stream_proc", 2, nargs, args));
-//   // stream_proc(nargs, args);
-//   wait(spawnrun);
-//   return OK;
-// }
-
 if(strncmp(args[0], "tscdf_fq" , 8)==0){
   resume (create((void *) stream_proc_futures, 1024, 20, "stream_proc_futures", 2, nargs, args));
   // stream_proc(nargs, args);
   wait(spawnrun);
   return OK;
 }
+
+// if(strncmp(args[0], "tscdf" ,5)==0){
+//   resume (create((void *) stream_proc, 1024, 20, "stream_proc", 2, nargs, args));
+//   // stream_proc(nargs, args);
+//   wait(spawnrun);
+//   return OK;
+// }
+
+
 
 for(i=0;i<funclength;i++){
         printf("%s\n",funcs[i]);
