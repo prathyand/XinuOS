@@ -23,7 +23,7 @@ int disposemsg_futures(int32 portmsg){
 void stream_consumer_future(int32 id, future_t *f) {
     // TODO: Consume all values from the work queue of the corresponding stream
     int procid=getpid();
-    kprintf("stream_consumer id:%d (pid:%d)\n",id,procid);
+    kprintf("stream_consumer_future id:%d (pid:%d)\n",id,procid);
     struct tscdf* tcpt= tscdf_init(time_window);
     int32 countime=0;
     // TODO: Consume all values from the work queue of the corresponding stream
@@ -73,14 +73,14 @@ void stream_consumer_future(int32 id, future_t *f) {
     // freemem(str->queue,work_queue_depth*sizeof(struct data_element));
     // freemem(str,sizeof(struct stream));
     future_free(f);
-    kprintf("stream_consumer exiting\n");
+    kprintf("stream_consumer_future exiting\n");
     ptsend(msgQ[id],procid);
 }
 
 int stream_proc_futures(int nargs, char* args[]) {
 
   // TODO: Parse arguments
-  char usage[] = "Usage: run tscdf_fq -s <num_streams> -w <work_queue_depth> -t <time_window> -o <output_time>\n";
+  char usage[] = "run tscdf_fq -s <num_streams> -w <work_queue_depth> -t <time_window> -o <output_time>\n";
     int i;
     char *ch, c;
     if (nargs != 9) {
