@@ -15,7 +15,7 @@ sid32 spawnrun;
  int stream_proc_futures(int nargs, char* args[]);
 shellcmd xsh_run(int nargs, char *args[]) {
 
-char *funcs[50]={"hello","list","prodcons","prodcons_bb","futest","tscdf","tscdf_fq"};
+char *funcs[50]={"hello","list","prodcons","prodcons_bb","futest","fstest","tscdf","tscdf_fq"};
 int funclength,i;
 i=0;
 
@@ -35,6 +35,14 @@ if((nargs==1) || (strncmp(args[1], "list", 4) == 0)){
 
 args++;
 nargs--;
+
+if (strncmp(args[0], "fstest", 6) == 0)
+    {
+      fstest(nargs, args);
+      // resume(create((void *)fstest, 4096, 20, "fstest", 2, nargs, args));
+      // wait(run_outer);
+      return OK;
+    }
 
 if(strncmp(args[0], "futest" ,  6)==0){
 
