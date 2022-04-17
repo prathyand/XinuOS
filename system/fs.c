@@ -388,63 +388,42 @@ int fs_close(int fd) {
 }
 
 int fs_create(char *filename, int mode) {
-    int i;
-    if (mode != O_CREAT || strlen(filename) > FILENAMELEN || fsd.inodes_used > fsd.ninodes){
-        return SYSERR;
+    if(mode != O_CREAT){
+      return SYSERR;
     }
-
     if(fsd.root_dir.numentries < DIRECTORY_SIZE){
-        for (i=0; i < fsd.root_dir.numentries; i++){
-            if (strcmp(filename, fsd.root_dir.entry[i].name) == 0){
+      int i;
+      for(i=0; i < fsd.root_dir.numentries; i++) {
+            if (strcmp(filename, fsd.root_dir.entry[i].name) == 0) {
                 return SYSERR;
             }
-            continue;
-        }
-        struct inode newnd;
-        for (i = fsd.inodes_used; i < fsd.ninodes; i++){
-            if (_fs_get_inode_by_num(0, i, &newnd) == OK){
-                newnd.nlink = 1;
-                newnd.size = 0;
-                newnd.type = INODE_TYPE_FILE;
-                newnd.device = 0;
-                newnd.id = i;
-                if (_fs_put_inode_by_num(0, i, &newnd) == SYSERR){
-                    return SYSERR;
-                }
-                break;
-            }
-        }
+      }
+      struct inode tt;
+      int stts = _fs_get_inode_by_num(0, fsd.inodes_used, &tt);
+      if (stts == SYSERR) {
+        return SYSERR;
+      }
 
-        if (fsd.ninodes<=i){
-            return SYSERR;
-        }
-        fsd.root_dir.entry[fsd.root_dir.numentries].inode_num = i;
-        strcpy(fsd.root_dir.entry[fsd.root_dir.numentries].name, filename);
-        fsd.root_dir.numentries+=1;
-        fsd.inodes_used += 1;
+      tt.size = 0;
+      tt.nlink = 1;
+      tt.id = fsd.inodes_used;
+      tt.type = INODE_TYPE_FILE;
+      tt.device = 0;
 
-        int k;
-        for (k=0; k < NUM_FD; k++){
-            if (oft[k].state == FSTATE_CLOSED){
+      fsd.root_dir.entry[fsd.root_dir.numentries].inode_num = fsd.inodes_used;
+      strcpy(fsd.root_dir.entry[fsd.root_dir.numentries].name, filename);
+      fsd.root_dir.numentries++;
 
-                oft[k].flag = O_RDWR;
-                oft[k].in = newnd;
-                oft[k].de = &fsd.root_dir.entry[i];
-                oft[k].fileptr = 0;
-                oft[k].state = FSTATE_OPEN;
-                break;
-            }
+      int ptsts = _fs_put_inode_by_num(0, tt.id, &tt);
+        if (ptsts == SYSERR) {
+          return SYSERR;
         }
 
-        if (k >= NUM_FD){
-            return SYSERR;
-        }
-        
-        return k;
-
+        fsd.inodes_used++;
+        return fs_open(filename, O_RDWR);
     }
+    return SYSERR;
 
-  return SYSERR;
 }
 
 int fs_seek(int fd, int offset) {
