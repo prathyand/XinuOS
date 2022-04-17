@@ -522,7 +522,7 @@ int fs_write(int fd, void *buf, int nbytes) {
     if(oft[fd].in.blocks[bk] == 0){
       int extr=0;
       int i;
-      for(i=0; i < fsd.nblocks; i++){
+      for(i=18; i < fsd.nblocks; i++){
         if (fs_getmaskbit(i) == 0) {
           fs_setmaskbit(i);
           oft[fd].in.blocks[bk] = i;
