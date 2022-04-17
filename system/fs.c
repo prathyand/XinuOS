@@ -317,65 +317,26 @@ void fs_printfreemask(void) { // print block bitmask
  * TODO: implement the functions below
  */
 int fs_open(char *filename, int flags) {
-    // check for flags
-    if(flags != O_RDONLY && flags != O_RDWR && flags != O_WRONLY){
+    if ((flags != O_WRONLY && flags != O_RDONLY  && flags != O_RDWR) || fsd.root_dir.numentries <= 0) {
         return SYSERR;
     }
-     int i;
-     int EN=-1;   
-     for (i = 0; i < DIRECTORY_SIZE; i++){
-         if (strcmp(fsd.root_dir.entry[i].name, filename) != 0){
-             continue;
-         }
+    int i;
+    struct inode nd;
 
-         if(fsd.root_dir.entry[i].inode_num <= fsd.ninodes && fsd.root_dir.entry[i].inode_num <= fsd.ninodes>=0){
-                EN=i;
-                break;
-         }
-
-     }
-
-     if(EN==-1){
-         return SYSERR;
-     }
-
-     if(i == DIRECTORY_SIZE){
-         return SYSERR;
-     }
-
-     for(i = 0; i < NUM_FD; i++){
-         if(oft[i].de->inode_num == fsd.root_dir.entry[EN].inode_num && oft[i].de->name == fsd.root_dir.entry[EN].name){
-
-             if (oft[i].state == FSTATE_OPEN){
-                 return SYSERR;
-             }
-
-            oft[i].state = FSTATE_OPEN;
-            return i;
-                
-         }
-
-         if(FSTATE_CLOSED==oft[i].state){
-             break;
-         }
-
+    for (i = 0; i < fsd.root_dir.numentries; i++) {
+        if (strcmp(fsd.root_dir.entry[i].name, filename) == 0 && oft[i].state != FSTATE_OPEN) {
+          int tp = fsd.root_dir.entry[i].inode_num;
+          _fs_get_inode_by_num(0, tp, &nd);
+          oft[i].state = FSTATE_OPEN;
+          oft[i].flag = flags;
+          oft[i].fileptr = 0;
+          oft[i].in = nd;
+          oft[i].de = &fsd.root_dir.entry[i];
+          _fs_put_inode_by_num(0, tp, &oft[i].in);
+          return i;
+        }
     }
-
-    if (!(i < NUM_FD)){
-        return SYSERR;
-    }
-
-    struct inode newnd;
-    if (_fs_get_inode_by_num(0, oft[i].in.id, &newnd) == SYSERR){
-        return SYSERR;
-    }
-
-    oft[i].flag = flags;
-    oft[i].fileptr = 0;
-    oft[i].in = newnd;
-    oft[i].de = &fsd.root_dir.entry[EN];
-    oft[i].state = FSTATE_OPEN;
-    return i;
+    return SYSERR;
 }
 
 int fs_close(int fd) {
