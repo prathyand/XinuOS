@@ -382,7 +382,7 @@ int fs_close(int fd) {
   if (oft[fd].state == FSTATE_CLOSED || fd < 0 || fd >= NUM_FD)  {
     return SYSERR;
   }
-    oft[fd].fileptr = 0;
+    // oft[fd].fileptr = 0;
     oft[fd].state = FSTATE_CLOSED;
     return OK; 
 }
@@ -415,12 +415,12 @@ int fs_create(char *filename, int mode) {
       fsd.root_dir.numentries++;
 
       int ptsts = _fs_put_inode_by_num(0, tt.id, &tt);
-        if (ptsts == SYSERR) {
-          return SYSERR;
-        }
+      if (ptsts == SYSERR) {
+        return SYSERR;
+      }
 
-        fsd.inodes_used++;
-        return fs_open(filename, O_RDWR);
+      fsd.inodes_used++;
+      return fs_open(filename, O_RDWR);
     }
     return SYSERR;
 
