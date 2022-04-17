@@ -484,14 +484,14 @@ int fs_read(int fd, void *buf, int nbytes) {
       break;
     }
     else if(n_count>0){
-    int rd = (nbytes>n_count) ? n_count:nbytes;
-    bs_bread(dev0, oft[fd].in.blocks[bk], of, buffptr, rd);
-    of = (of + rd) % fsd.blocksz;
-    nbytes -= rd;
-    buffptr += rd;
-  }
-  n_count = fsd.blocksz;
-  bk++;
+      int rd = (nbytes>n_count) ? n_count:nbytes;
+      bs_bread(dev0, oft[fd].in.blocks[bk], of, buffptr, rd);
+      of = (of + rd) % fsd.blocksz;
+      nbytes -= rd;
+      buffptr += rd;
+    }
+    n_count = fsd.blocksz;
+    bk++;
   }
   oft[fd].fileptr += nbtcp;
   return nbtcp;
@@ -512,7 +512,7 @@ int fs_write(int fd, void *buf, int nbytes) {
 
   int t=0;
   while(1==1){
-    if(nbytes>0){
+    if(nbytes<=0){
       break;
     }
     int wrtcont=0,bk=oft[fd].fileptr / fsd.blocksz,hd=oft[fd].fileptr % fsd.blocksz;
