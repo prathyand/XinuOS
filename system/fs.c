@@ -468,11 +468,12 @@ int fs_read(int fd, void *buf, int nbytes) {
     return SYSERR; 
   }
 
+  
+  if(oft[fd].in.size - oft[fd].fileptr<nbytes){
+    nbytes = (oft[fd].in.size - oft[fd].fileptr);
+  }
   if(oft[fd].in.size * INODEDIRECTBLOCKS<nbytes){
     nbytes = oft[fd].in.size * INODEDIRECTBLOCKS;
-  }
-  else if(oft[fd].in.size - oft[fd].fileptr<nbytes){
-    nbytes = (oft[fd].in.size - oft[fd].fileptr);
   }
   int of=oft[fd].fileptr % fsd.blocksz;
   int nbtcp = nbytes,n_count=fsd.blocksz-of,bk=oft[fd].fileptr / fsd.blocksz;
