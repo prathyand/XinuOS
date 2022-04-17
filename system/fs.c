@@ -16,6 +16,9 @@ extern int dev0;
 
 char block_cache[512];
 
+int _fs_get_inode_by_num(int dev, int inode_number, inode_t *out);
+int _fs_put_inode_by_num(int dev, int inode_number, inode_t *in);
+
 #define SB_BLK 0 // Superblock
 #define BM_BLK 1 // Bitmapblock
 
@@ -445,15 +448,140 @@ int fs_create(char *filename, int mode) {
 }
 
 int fs_seek(int fd, int offset) {
-  return SYSERR;
+  if(fd > NUM_FD){
+    return SYSERR;
+  }
+  else if(fd < 0){
+    return SYSERR; 
+  }
+  else if(oft[fd].state != FSTATE_OPEN){
+    return SYSERR; 
+  }
+  else if(offset > oft[fd].in.size){
+    return SYSERR; 
+  }
+  else if(offset < 0){
+    return SYSERR; 
+  }
+
+  oft[fd].fileptr = offset;
+
+  return OK;
 }
 
 int fs_read(int fd, void *buf, int nbytes) {
-  return SYSERR;
+  if(fd > NUM_FD){
+    return SYSERR;
+  }
+  else if(fd < 0){
+    return SYSERR; 
+  }
+  else if(oft[fd].state != FSTATE_OPEN){
+    return SYSERR; 
+  }
+  else if(nbytes < 0){
+    return SYSERR; 
+  }
+  else if(oft[fd].flag == O_WRONLY){
+    return SYSERR; 
+  }
+  else if(oft[fd].state != FSTATE_OPEN){
+    return SYSERR; 
+  }
+
+  if(oft[fd].in.size * INODEDIRECTBLOCKS<nbytes){
+    nbytes = oft[fd].in.size * INODEDIRECTBLOCKS;
+  }
+  else if(oft[fd].in.size - oft[fd].fileptr<nbytes){
+    nbytes = (oft[fd].in.size - oft[fd].fileptr);
+  }
+  int of=oft[fd].fileptr % fsd.blocksz;
+  int nbtcp = nbytes,n_count=fsd.blocksz-of,bk=oft[fd].fileptr / fsd.blocksz;
+  char* buffptr = buf;
+  
+  while(1==1){
+    if(nbytes <= 0){
+      break;
+    }
+    else if(n_count>0){
+    int rd = (nbytes>n_count) ? n_count:nbytes;
+    bs_bread(dev0, oft[fd].in.blocks[bk], of, buffptr, rd);
+    of = (of + rd) % fsd.blocksz;
+    nbytes -= rd;
+    buffptr += rd;
+  }
+  n_count = fsd.blocksz;
+  bk++;
+  }
+  oft[fd].fileptr += nbtcp;
+  return nbtcp;
 }
 
 int fs_write(int fd, void *buf, int nbytes) {
-  return SYSERR;
+  if (fd < 0 || fd > NUM_FD || oft[fd].flag == O_RDONLY || oft[fd].state != FSTATE_OPEN || nbytes < 0){
+    return SYSERR;
+  }
+ 
+  nbytes = (nbytes>5120 - oft[fd].fileptr)?5120 - oft[fd].fileptr:nbytes;
+  if(buf == NULL){
+    return 0;
+  }
+  if(nbytes==0){
+    return 0;
+  }
+
+  int t=0;
+  while(1==1){
+    if(nbytes>0){
+      break;
+    }
+    int wrtcont=0,bk=oft[fd].fileptr / fsd.blocksz,hd=oft[fd].fileptr % fsd.blocksz;
+    int amt=fsd.blocksz - (hd % fsd.blocksz);
+    wrtcont = (nbytes <= amt)?nbytes:amt;
+
+    if(oft[fd].in.blocks[bk] == 0){
+      int extr=0;
+      int i;
+      for(i=0; i < fsd.nblocks; i++){
+        if (fs_getmaskbit(i) == 0) {
+          fs_setmaskbit(i);
+          oft[fd].in.blocks[bk] = i;
+          inode_t tt;
+          _fs_get_inode_by_num(dev0, oft[fd].in.id, &tt);
+          tt.blocks[bk] = i;
+          _fs_put_inode_by_num(dev0, oft[fd].in.id, &tt);
+
+          if (bs_bwrite(dev0, oft[fd].in.blocks[bk], hd, buf, wrtcont) == SYSERR) {
+            return SYSERR;
+          } 
+          extr+=1;
+          break;
+        }
+      }
+      if(!extr){
+        return SYSERR;
+      }
+    }
+      else if (bs_bwrite(dev0, oft[fd].in.blocks[bk], hd, buf, wrtcont) == SYSERR){
+        return SYSERR;
+      }
+
+      oft[fd].fileptr += wrtcont;
+      buf += wrtcont;
+      t+=wrtcont;
+      nbytes -= wrtcont;
+  }
+      if(oft[fd].in.size < oft[fd].fileptr) {
+        // reset size
+        oft[fd].in.size = oft[fd].fileptr;
+        inode_t tt;
+        _fs_get_inode_by_num(dev0, oft[fd].in.id, &tt);
+        tt.size = oft[fd].fileptr;
+        _fs_put_inode_by_num(dev0, oft[fd].in.id, &tt);
+      }
+
+return t;
+    
 }
 
 int fs_link(char *src_filename, char* dst_filename) {
