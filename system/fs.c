@@ -372,19 +372,19 @@ int fs_create(char *filename, int mode) {
             break;
           }
       }
-      int found;
+      // int found;
       struct inode tt;
-      for (i = 0; i < fsd.ninodes; i++) {
-        _fs_get_inode_by_num(dev0, i, &tt);
-        if(tt.id == EMPTY){
-          found=1;
-          break;
-        }
-      }
+      // for (i = 0; i < fsd.ninodes; i++) {
+      //   _fs_get_inode_by_num(dev0, i, &tt);
+      //   if(tt.id == EMPTY){
+      //     found=1;
+      //     break;
+      //   }
+      // }
 
-      if(!found){
-        return SYSERR;
-      }
+      // if(!found){
+      //   return SYSERR;
+      // }
       
       // int stts = _fs_get_inode_by_num(0, fsd.inodes_used, &tt);
       // if (stts == SYSERR) {
@@ -393,7 +393,7 @@ int fs_create(char *filename, int mode) {
 
       tt.size = 0;
       tt.nlink = 1;
-      tt.id = i;
+      tt.id = nextfreeentry;
       tt.type = INODE_TYPE_FILE;
       tt.device = dev0;
 
