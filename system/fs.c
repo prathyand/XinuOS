@@ -464,6 +464,7 @@ int fs_write(int fd, void *buf, int nbytes) {
   }
  
   nbytes = (nbytes>5120 - oft[fd].fileptr)?5120 - oft[fd].fileptr:nbytes;
+
   if(buf == NULL){
     return 0;
   }
@@ -526,7 +527,43 @@ return t;
 }
 
 int fs_link(char *src_filename, char* dst_filename) {
-  return SYSERR;
+
+    int i;
+    if(strlen(src_filename)>FILENAMELEN || strlen(dst_filename)>FILENAMELEN){
+      return SYSERR;
+    }
+    // check for duplicate
+    if (strcmp(src_filename, dst_filename) == 0) {
+        return SYSERR;
+    }
+    for(i=0; i < DIRECTORY_SIZE; i++) {
+        if (strcmp(dst_filename, fsd.root_dir.entry[i].name) == 0) {
+            return SYSERR;
+        }
+    }
+
+    if(fsd.root_dir.numentries==DIRECTORY_SIZE){
+        return SYSERR;
+    }
+    int nextfreeentry;
+    for(nextfreeentry=0; nextfreeentry < DIRECTORY_SIZE; nextfreeentry++) {
+        if(fsd.root_dir.entry[nextfreeentry].inode_num==EMPTY){
+          break;
+        }
+    }
+
+    for(i=0; i < DIRECTORY_SIZE; i++) {
+        if(strcmp(src_filename, fsd.root_dir.entry[i].name) == 0) {
+          strcpy(fsd.root_dir.entry[nextfreeentry].name, dst_filename);
+          fsd.root_dir.entry[nextfreeentry].inode_num = fsd.root_dir.entry[i].inode_num;
+          
+          return OK;
+        }
+    }
+
+
+    return SYSERR;
+  
 }
 
 int fs_unlink(char *filename) {
