@@ -326,7 +326,11 @@ int fs_open(char *filename, int flags) {
     for (i = 0; i < fsd.root_dir.numentries; i++) {
         if (strcmp(fsd.root_dir.entry[i].name, filename) == 0 && oft[i].state != FSTATE_OPEN) {
           int tp = fsd.root_dir.entry[i].inode_num;
-          _fs_get_inode_by_num(0, tp, &nd);
+          int geterr;
+          geterr=_fs_get_inode_by_num(0, tp, &nd);
+          if(geterr==SYSERR){
+            return SYSERR;
+          }
           oft[i].state = FSTATE_OPEN;
           oft[i].flag = flags;
           oft[i].fileptr = 0;
@@ -564,9 +568,16 @@ int fs_link(char *src_filename, char* dst_filename) {
           fsd.root_dir.entry[nextfreeentry].inode_num = fsd.root_dir.entry[i].inode_num;
           fsd.root_dir.numentries+=1;
           inode_t tempnode;
-          _fs_get_inode_by_num(dev0, fsd.root_dir.entry[i].inode_num, &tempnode);
+          int geterr;
+          geterr=_fs_get_inode_by_num(dev0, fsd.root_dir.entry[i].inode_num, &tempnode);
+          if(geterr==SYSERR){
+              return SYSERR;
+          }   
           tempnode.nlink+=1;
-           _fs_put_inode_by_num(dev0, fsd.root_dir.entry[i].inode_num, &tempnode);
+           geterr=_fs_put_inode_by_num(dev0, fsd.root_dir.entry[i].inode_num, &tempnode);
+           if(geterr==SYSERR){
+              return SYSERR;
+          }  
           return OK;
         }
     }
@@ -594,8 +605,11 @@ int fs_unlink(char *filename) {
     // now our filename is found and exists at index i
 
     inode_t tempnode;
-    int inodeid=fsd.root_dir.entry[i].inode_num;
-    _fs_get_inode_by_num(dev0, inodeid, &tempnode);
+    int inodeid=fsd.root_dir.entry[i].inode_num,geterr;
+    geterr=_fs_get_inode_by_num(dev0, inodeid, &tempnode);
+    if(geterr==SYSERR){
+      return SYSERR;
+    }
 
     if(tempnode.nlink==1){
         tempnode.id=EMPTY;
@@ -608,22 +622,25 @@ int fs_unlink(char *filename) {
         memset(fsd.root_dir.entry[i].name, 0, FILENAMELEN);
         fsd.root_dir.entry[i].inode_num=EMPTY;
         
-        int j;
-        for (j = 0; j < NUM_FD; j++) {
-          if(inodeid==oft[j].in.id){
-            oft[j].state     = 0;
-            oft[j].fileptr   = 0;
-            oft[j].de        = NULL;
-            oft[j].in.type   = 0;
-            oft[j].in.nlink  = 0;
-            oft[j].in.device = 0;
-            oft[j].in.size   = 0;
-            oft[j].flag = 0;
-            memset(oft[j].in.blocks, 0, sizeof(oft[j].in.blocks));
-            }
-        }
+        // int j;
+        // for (j = 0; j < NUM_FD; j++) {
+        //   if(inodeid==oft[j].in.id){
+        //     oft[j].state     = 0;
+        //     oft[j].fileptr   = 0;
+        //     oft[j].de        = NULL;
+        //     oft[j].in.type   = 0;
+        //     oft[j].in.nlink  = 0;
+        //     oft[j].in.device = 0;
+        //     oft[j].in.size   = 0;
+        //     oft[j].flag = 0;
+        //     memset(oft[j].in.blocks, 0, sizeof(oft[j].in.blocks));
+        //     }
+        // }
         fsd.root_dir.numentries-=1;
-        _fs_put_inode_by_num(dev0, inodeid, &tempnode);
+        geterr=_fs_put_inode_by_num(dev0, inodeid, &tempnode);
+        if(geterr==SYSERR){
+            return SYSERR;
+        }
         return OK;
     }
 
@@ -632,7 +649,10 @@ int fs_unlink(char *filename) {
       fsd.root_dir.entry[i].inode_num=EMPTY;
       tempnode.nlink-=1;
       fsd.root_dir.numentries-=1;
-      _fs_put_inode_by_num(dev0, inodeid, &tempnode);
+      geterr=_fs_put_inode_by_num(dev0, inodeid, &tempnode);
+      if(geterr==SYSERR){
+            return SYSERR;
+        }
       return OK;
     }
   return SYSERR;
