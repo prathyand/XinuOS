@@ -618,6 +618,7 @@ int fs_unlink(char *filename) {
             oft[j].flag      = 0;
             }
         }
+        fsd.root_dir.numentries-=1;
         _fs_put_inode_by_num(dev0, inodeid, &tempnode);
         return OK;
     }
@@ -626,6 +627,7 @@ int fs_unlink(char *filename) {
       memset(fsd.root_dir.entry[i].name, 0, FILENAMELEN);
       fsd.root_dir.entry[i].inode_num=EMPTY;
       tempnode.nlink-=1;
+      fsd.root_dir.numentries-=1;
       _fs_put_inode_by_num(dev0, inodeid, &tempnode);
       return OK;
     }
