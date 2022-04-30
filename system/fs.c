@@ -607,6 +607,17 @@ int fs_unlink(char *filename) {
         fsd.inodes_used -=1;
         memset(fsd.root_dir.entry[i].name, 0, FILENAMELEN);
         fsd.root_dir.entry[i].inode_num=EMPTY;
+        
+        int j;
+        for (j = 0; j < NUM_FD; j++) {
+          if(inodeid==oft[j].in.id){
+            oft[j].state     = 0;
+            oft[j].fileptr   = 0;
+            oft[j].de        = NULL;
+            oft[j].in=tempnode;
+            oft[j].flag      = 0;
+            }
+        }
         _fs_put_inode_by_num(dev0, inodeid, &tempnode);
         return OK;
     }
