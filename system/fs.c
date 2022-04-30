@@ -358,6 +358,9 @@ int fs_create(char *filename, int mode) {
     }
     if(fsd.root_dir.numentries < DIRECTORY_SIZE){
       int i;
+      if(strlen(filename)>FILENAMELEN){
+      return SYSERR;
+      }
       for(i=0; i < fsd.root_dir.numentries; i++) {
             if (strcmp(filename, fsd.root_dir.entry[i].name) == 0) {
                 return SYSERR;
@@ -369,13 +372,18 @@ int fs_create(char *filename, int mode) {
             break;
           }
       }
-
+      int found;
       struct inode tt;
       for (i = 0; i < fsd.ninodes; i++) {
         _fs_get_inode_by_num(dev0, i, &tt);
         if(tt.id == EMPTY){
+          found=1;
           break;
         }
+      }
+
+      if(!found){
+        return SYSERR;
       }
       
       // int stts = _fs_get_inode_by_num(0, fsd.inodes_used, &tt);
@@ -627,8 +635,13 @@ int fs_unlink(char *filename) {
         tempnode.device = 0;
         tempnode.size   = 0;
         fsd.inodes_used -=1;
+        geterr=_fs_put_inode_by_num(dev0, inodeid, &tempnode);
+
+
         memset(fsd.root_dir.entry[i].name, 0, FILENAMELEN);
         fsd.root_dir.entry[i].inode_num=EMPTY;
+
+        fsd.root_dir.numentries-=1;
         
         // int j;
         // for (j = 0; j < NUM_FD; j++) {
@@ -644,8 +657,8 @@ int fs_unlink(char *filename) {
         //     memset(oft[j].in.blocks, 0, sizeof(oft[j].in.blocks));
         //     }
         // }
-        fsd.root_dir.numentries-=1;
-        geterr=_fs_put_inode_by_num(dev0, inodeid, &tempnode);
+        
+        
         if(geterr==SYSERR){
             return SYSERR;
         }
