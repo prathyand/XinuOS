@@ -571,33 +571,48 @@ int fs_link(char *src_filename, char* dst_filename) {
 }
 
 int fs_unlink(char *filename) {
-    // int i;
-    // if(strlen(filename)>FILENAMELEN){
-    //   return SYSERR;
-    // }
-    // int found=0;
-    // for(i=0; i < DIRECTORY_SIZE; i++) {
-    //     if (strcmp(filename, fsd.root_dir.entry[i].name) == 0) {
-    //         found=1;
-    //         break;
-    //     }
-    // }
-    // if(!found){
-    //   return SYSERR;
-    // }
-    // // now our filename is found and exists at index i
+    int i;
+    if(strlen(filename)>FILENAMELEN){
+      return SYSERR;
+    }
+    int found=0;
+    for(i=0; i < DIRECTORY_SIZE; i++) {
+        if (strcmp(filename, fsd.root_dir.entry[i].name) == 0) {
+            found=1;
+            break;
+        }
+    }
+    if(!found){
+      return SYSERR;
+    }
+    // now our filename is found and exists at index i
 
-    // inode_t tempnode;
-    // _fs_get_inode_by_num(dev0, i, &tempnode);
-    // tempnode
+    inode_t tempnode;
+    int inodeid=fsd.root_dir.entry[i].inode_num;
+    _fs_get_inode_by_num(dev0, inodeid, &tempnode);
+
+    if(tempnode.nlink==1){
+        tempnode.id=EMPTY;
+        tempnode.nlink=0;
+        memset(tempnode.blocks, 0, sizeof(tempnode.blocks));
+        tempnode.type   = 0;
+        tempnode.device = 0;
+        tempnode.size   = 0;
+        fsd.inodes_used -=1;
+        memset(fsd.root_dir.entry[i].name, 0, FILENAMELEN);
+        fsd.root_dir.entry[i].inode_num=EMPTY;
+    }
+
+    else{
+      memset(fsd.root_dir.entry[i].name, 0, FILENAMELEN);
+      fsd.root_dir.entry[i].inode_num=EMPTY;
+      tempnode.nlink=0;
+    }
+
+    _fs_put_inode_by_num(dev0, inodeid, &tempnode);
 
 
-
-
-
-
-
-  return SYSERR;
+  return OK;
 }
 
 #endif /* FS */
