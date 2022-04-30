@@ -556,7 +556,7 @@ int fs_link(char *src_filename, char* dst_filename) {
         if(strcmp(src_filename, fsd.root_dir.entry[i].name) == 0) {
           strcpy(fsd.root_dir.entry[nextfreeentry].name, dst_filename);
           fsd.root_dir.entry[nextfreeentry].inode_num = fsd.root_dir.entry[i].inode_num;
-          
+          fsd.root_dir.numentries+=1;
           return OK;
         }
     }
