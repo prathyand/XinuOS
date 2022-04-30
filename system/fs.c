@@ -322,22 +322,34 @@ int fs_open(char *filename, int flags) {
     }
     int i;
     struct inode nd;
+    int fdindex=-1;
+    for(i=0;i<NUM_FD;i++){
+      if(oft[i].state==FSTATE_CLOSED){
+        fdindex=i;
+        break;
+      }
+    }
+    if(fdindex==-1){
+      return SYSERR;
+    }
+  
 
-    for (i = 0; i < fsd.root_dir.numentries; i++) {
-        if (strcmp(fsd.root_dir.entry[i].name, filename) == 0 && oft[i].state != FSTATE_OPEN) {
+    for (i = 0; i < DIRECTORY_SIZE; i++) {
+        if (strcmp(fsd.root_dir.entry[i].name, filename) == 0) {
+
           int tp = fsd.root_dir.entry[i].inode_num;
           int geterr;
           geterr=_fs_get_inode_by_num(0, tp, &nd);
           if(geterr==SYSERR){
             return SYSERR;
           }
-          oft[i].state = FSTATE_OPEN;
-          oft[i].flag = flags;
-          oft[i].fileptr = 0;
-          oft[i].in = nd;
-          oft[i].de = &fsd.root_dir.entry[i];
+          oft[fdindex].state = FSTATE_OPEN;
+          oft[fdindex].flag = flags;
+          oft[fdindex].fileptr = 0;
+          oft[fdindex].in = nd;
+          oft[fdindex].de = &fsd.root_dir.entry[i];
           _fs_put_inode_by_num(0, tp, &oft[i].in);
-          return i;
+          return fdindex;
         }
     }
     return SYSERR;
@@ -366,25 +378,31 @@ int fs_create(char *filename, int mode) {
                 return SYSERR;
             }
       }
+      int found=0;
       int nextfreeentry;
       for(nextfreeentry=0; nextfreeentry < DIRECTORY_SIZE; nextfreeentry++) {
           if(fsd.root_dir.entry[nextfreeentry].inode_num==EMPTY){
+            found=1;
             break;
           }
       }
-      // int found;
-      struct inode tt;
-      // for (i = 0; i < fsd.ninodes; i++) {
-      //   _fs_get_inode_by_num(dev0, i, &tt);
-      //   if(tt.id == EMPTY){
-      //     found=1;
-      //     break;
-      //   }
-      // }
+      if(!found){
+        return SYSERR;
+      }
 
-      // if(!found){
-      //   return SYSERR;
-      // }
+      struct inode tt;
+      found=0;
+      for (i = 0; i < fsd.ninodes; i++) {
+        _fs_get_inode_by_num(dev0, i, &tt);
+        if(tt.id == EMPTY){
+          found=1;
+          break;
+        }
+      }
+
+      if(!found){
+        return SYSERR;
+      }
       
       // int stts = _fs_get_inode_by_num(0, fsd.inodes_used, &tt);
       // if (stts == SYSERR) {
@@ -393,7 +411,7 @@ int fs_create(char *filename, int mode) {
 
       tt.size = 0;
       tt.nlink = 1;
-      tt.id = fsd.inodes_used;
+      tt.id = i;
       tt.type = INODE_TYPE_FILE;
       tt.device = dev0;
 
