@@ -369,15 +369,23 @@ int fs_create(char *filename, int mode) {
             break;
           }
       }
+
       struct inode tt;
-      int stts = _fs_get_inode_by_num(0, fsd.inodes_used, &tt);
-      if (stts == SYSERR) {
-        return SYSERR;
+      for (i = 0; i < fsd.ninodes; i++) {
+        _fs_get_inode_by_num(dev0, i, &tt);
+        if(tt.id == EMPTY){
+          break;
+        }
       }
+      
+      // int stts = _fs_get_inode_by_num(0, fsd.inodes_used, &tt);
+      // if (stts == SYSERR) {
+      //   return SYSERR;
+      // }
 
       tt.size = 0;
       tt.nlink = 1;
-      tt.id = fsd.inodes_used;
+      tt.id = i;
       tt.type = INODE_TYPE_FILE;
       tt.device = 0;
 
