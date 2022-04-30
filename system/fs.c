@@ -623,7 +623,7 @@ int fs_unlink(char *filename) {
         return OK;
     }
 
-    else{
+    if(tempnode.nlink>1){
       memset(fsd.root_dir.entry[i].name, 0, FILENAMELEN);
       fsd.root_dir.entry[i].inode_num=EMPTY;
       tempnode.nlink-=1;
