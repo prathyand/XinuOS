@@ -393,7 +393,7 @@ int fs_create(char *filename, int mode) {
 
       tt.size = 0;
       tt.nlink = 1;
-      tt.id = nextfreeentry;
+      tt.id = fsd.inodes_used;
       tt.type = INODE_TYPE_FILE;
       tt.device = dev0;
 
