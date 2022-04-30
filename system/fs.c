@@ -332,7 +332,6 @@ int fs_open(char *filename, int flags) {
     if(fdindex==-1){
       return SYSERR;
     }
-  
 
     for (i = 0; i < DIRECTORY_SIZE; i++) {
         if (strcmp(fsd.root_dir.entry[i].name, filename) == 0) {
@@ -392,7 +391,7 @@ int fs_create(char *filename, int mode) {
 
       struct inode tt;
       found=0;
-      for (i = 0; i < fsd.ninodes; i++) {
+      for (i = 1; i < fsd.ninodes; i++) {
         _fs_get_inode_by_num(dev0, i, &tt);
         if(tt.id == EMPTY){
           found=1;
