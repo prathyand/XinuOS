@@ -557,6 +557,10 @@ int fs_link(char *src_filename, char* dst_filename) {
           strcpy(fsd.root_dir.entry[nextfreeentry].name, dst_filename);
           fsd.root_dir.entry[nextfreeentry].inode_num = fsd.root_dir.entry[i].inode_num;
           fsd.root_dir.numentries+=1;
+          inode_t tempnode;
+          _fs_get_inode_by_num(dev0, fsd.root_dir.entry[i].inode_num, &tempnode);
+          tempnode.nlink+=1;
+           _fs_put_inode_by_num(dev0, fsd.root_dir.entry[i].inode_num, &tempnode);
           return OK;
         }
     }
@@ -567,6 +571,32 @@ int fs_link(char *src_filename, char* dst_filename) {
 }
 
 int fs_unlink(char *filename) {
+    // int i;
+    // if(strlen(filename)>FILENAMELEN){
+    //   return SYSERR;
+    // }
+    // int found=0;
+    // for(i=0; i < DIRECTORY_SIZE; i++) {
+    //     if (strcmp(filename, fsd.root_dir.entry[i].name) == 0) {
+    //         found=1;
+    //         break;
+    //     }
+    // }
+    // if(!found){
+    //   return SYSERR;
+    // }
+    // // now our filename is found and exists at index i
+
+    // inode_t tempnode;
+    // _fs_get_inode_by_num(dev0, i, &tempnode);
+    // tempnode
+
+
+
+
+
+
+
   return SYSERR;
 }
 
