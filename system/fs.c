@@ -389,7 +389,7 @@ int fs_create(char *filename, int mode) {
       tt.type = INODE_TYPE_FILE;
       tt.device = 0;
 
-      fsd.root_dir.entry[nextfreeentry].inode_num = fsd.inodes_used;
+      fsd.root_dir.entry[nextfreeentry].inode_num = tt.id;
       strcpy(fsd.root_dir.entry[nextfreeentry].name, filename);
       fsd.root_dir.numentries++;
 
