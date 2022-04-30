@@ -608,16 +608,20 @@ int fs_unlink(char *filename) {
         memset(fsd.root_dir.entry[i].name, 0, FILENAMELEN);
         fsd.root_dir.entry[i].inode_num=EMPTY;
         
-        // int j;
-        // for (j = 0; j < NUM_FD; j++) {
-        //   if(inodeid==oft[j].in.id){
-        //     oft[j].state     = 0;
-        //     oft[j].fileptr   = 0;
-        //     oft[j].de        = NULL;
-        //     oft[j].in=tempnode;
-        //     oft[j].flag = 0;
-        //     }
-        // }
+        int j;
+        for (j = 0; j < NUM_FD; j++) {
+          if(inodeid==oft[j].in.id){
+            oft[j].state     = 0;
+            oft[j].fileptr   = 0;
+            oft[j].de        = NULL;
+            oft[j].in.type   = 0;
+            oft[j].in.nlink  = 0;
+            oft[j].in.device = 0;
+            oft[j].in.size   = 0;
+            oft[j].flag = 0;
+            memset(oft[j].in.blocks, 0, sizeof(oft[j].in.blocks));
+            }
+        }
         fsd.root_dir.numentries-=1;
         _fs_put_inode_by_num(dev0, inodeid, &tempnode);
         return OK;
