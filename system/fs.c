@@ -571,17 +571,20 @@ int fs_link(char *src_filename, char* dst_filename) {
             return SYSERR;
         }
     }
+    
 
     if(fsd.root_dir.numentries==DIRECTORY_SIZE){
         return SYSERR;
     }
-    int nextfreeentry;
+    int nextfreeentry=-1;
     for(nextfreeentry=0; nextfreeentry < DIRECTORY_SIZE; nextfreeentry++) {
         if(fsd.root_dir.entry[nextfreeentry].inode_num==EMPTY){
           break;
         }
     }
-
+    if(nextfreeentry==-1){
+      return SYSERR;
+    }
     for(i=0; i < DIRECTORY_SIZE; i++) {
         if(strcmp(src_filename, fsd.root_dir.entry[i].name) == 0) {
           strcpy(fsd.root_dir.entry[nextfreeentry].name, dst_filename);
@@ -679,6 +682,20 @@ int fs_unlink(char *filename) {
             return SYSERR;
         }
       fsd.root_dir.numentries-=1;
+      int j;
+      for (j = 0; j < NUM_FD; j++) {
+        if(inodeid==oft[j].in.id){
+          oft[j].state     = 0;
+          oft[j].fileptr   = 0;
+          oft[j].de        = NULL;
+          oft[j].in.type   = 0;
+          oft[j].in.nlink  = 0;
+          oft[j].in.device = 0;
+          oft[j].in.size   = 0;
+          oft[j].flag = 0;
+          memset(oft[j].in.blocks, 0, sizeof(oft[j].in.blocks));
+          }
+        }
       return OK;
     }
   return SYSERR;
