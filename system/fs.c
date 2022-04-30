@@ -395,7 +395,7 @@ int fs_create(char *filename, int mode) {
       tt.nlink = 1;
       tt.id = i;
       tt.type = INODE_TYPE_FILE;
-      tt.device = 0;
+      tt.device = dev0;
 
       fsd.root_dir.entry[nextfreeentry].inode_num = tt.id;
       strcpy(fsd.root_dir.entry[nextfreeentry].name, filename);
@@ -407,7 +407,11 @@ int fs_create(char *filename, int mode) {
       }
 
       fsd.inodes_used++;
-      return fs_open(filename, O_RDWR);
+      int retfd=fs_open(filename, O_RDWR);
+      if(retfd==SYSERR){
+        return SYSERR;
+      }
+      return retfd;
     }
     return SYSERR;
 
@@ -640,28 +644,28 @@ int fs_unlink(char *filename) {
 
         memset(fsd.root_dir.entry[i].name, 0, FILENAMELEN);
         fsd.root_dir.entry[i].inode_num=EMPTY;
-
+        if(geterr==SYSERR){
+                    return SYSERR;
+        }
         fsd.root_dir.numentries-=1;
         
-        // int j;
-        // for (j = 0; j < NUM_FD; j++) {
-        //   if(inodeid==oft[j].in.id){
-        //     oft[j].state     = 0;
-        //     oft[j].fileptr   = 0;
-        //     oft[j].de        = NULL;
-        //     oft[j].in.type   = 0;
-        //     oft[j].in.nlink  = 0;
-        //     oft[j].in.device = 0;
-        //     oft[j].in.size   = 0;
-        //     oft[j].flag = 0;
-        //     memset(oft[j].in.blocks, 0, sizeof(oft[j].in.blocks));
-        //     }
-        // }
-        
-        
-        if(geterr==SYSERR){
-            return SYSERR;
+        int j;
+        for (j = 0; j < NUM_FD; j++) {
+          if(inodeid==oft[j].in.id){
+            oft[j].state     = 0;
+            oft[j].fileptr   = 0;
+            oft[j].de        = NULL;
+            oft[j].in.type   = 0;
+            oft[j].in.nlink  = 0;
+            oft[j].in.device = 0;
+            oft[j].in.size   = 0;
+            oft[j].flag = 0;
+            memset(oft[j].in.blocks, 0, sizeof(oft[j].in.blocks));
+            }
         }
+        
+        
+        
         return OK;
     }
 
@@ -669,11 +673,12 @@ int fs_unlink(char *filename) {
       memset(fsd.root_dir.entry[i].name, 0, FILENAMELEN);
       fsd.root_dir.entry[i].inode_num=EMPTY;
       tempnode.nlink-=1;
-      fsd.root_dir.numentries-=1;
+      
       geterr=_fs_put_inode_by_num(dev0, inodeid, &tempnode);
       if(geterr==SYSERR){
             return SYSERR;
         }
+      fsd.root_dir.numentries-=1;
       return OK;
     }
   return SYSERR;
